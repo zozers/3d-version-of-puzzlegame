@@ -8,8 +8,12 @@
 
   <script src="js/three.js"></script>
   <script src="js/TrackballControls.js"></script>
+  <script src="js/GLTFLoader.js"></script>
+  <script src="js/DragControls.js"></script>
+  
   <script>
 
+      // character model by Katerina Novakova https://sketchfab.com/3d-models/pokemon-charmander-1f18443b6a7a41b38a9be521731040a6
 
       var colorArr = [0xf3ce30, 0x3aa3b1, 0xe5534f];
 
@@ -19,6 +23,7 @@
         yellow: {"r": 0.9529411764705882, "g": 0.807843137254902, "b": 0.18823529411764706}
       }
 
+      var loader = new THREE.GLTFLoader();
 
       function generate_random_cube_material(colorArr){
 
@@ -32,7 +37,7 @@
 
       }
 
-      var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
+      var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats, charmander;
 
       var params = {
         orthographicCamera: false
@@ -41,6 +46,8 @@
       var frustumSize = 400;
 
       var material_matrices = []
+
+      var char_obj = []
 
       init();
       animate();
@@ -52,9 +59,8 @@
         var size = 75;
 
         perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
-        perspectiveCamera.position.z = 300;
-        perspectiveCamera.position.x = 100;
-        perspectiveCamera.position.y = -100;
+        perspectiveCamera.position.z = 500;
+
 
 
 
@@ -72,28 +78,28 @@
           material_matrices.push(material)
           var mesh = new THREE.Mesh( geometry, material );
           if(i <= 2){
-            mesh.position.x = ((i*size) - (size/2));
-            mesh.position.y = (-1*(size/2));
+            mesh.position.x = ((i*size) - (size));
+            mesh.position.y = (-1*(size));
             mesh.position.z = (0);
             var tempx = i
           }
           else if(i > 2 && i < 5){
 
-            mesh.position.x = ((tempx*size)-(size/2));
-            mesh.position.y = ((i-2) * size - (size/2));
+            mesh.position.x = ((tempx*size)-(size));
+            mesh.position.y = ((i-2) * size - (size));
             console.log(i);
             mesh.position.z = (0);
             var tempy = i-2
           }
           
           else if(i >=5 && i < 7){
-            mesh.position.x = ((i%2)*size-(size/2));
-            mesh.position.y = (tempy * size-(size/2));
+            mesh.position.x = ((i%2)*size-(size));
+            mesh.position.y = (tempy * size-(size));
             mesh.position.z = (0);
           }
           else{
-            mesh.position.x = (-1*(size/2))
-            mesh.position.y = ((tempy-1) * size - (size/2));
+            mesh.position.x = (-1*(size))
+            mesh.position.y = ((tempy-1) * size - (size));
             mesh.position.z = (0);
           }
           mesh.updateMatrix();
@@ -106,6 +112,36 @@
         var light = new THREE.AmbientLight( 0xFFFFFF );
         scene.add( light );
 
+
+
+        loader.load( 'models/charmander.gltf', function ( gltf ) {
+          gltf.scene.scale.set(10,10,10)
+
+          gltf.scene.rotateX(-80);
+          gltf.scene.position.x = -75;
+          gltf.scene.position.y = -75;
+          gltf.scene.position.z = 37.5;
+
+          gltf.scene.name = "zogurtini";
+          scene.add( gltf.scene );
+          console.log(gltf.scene);
+
+          char_obj.push(gltf.scene);
+          render();
+        },
+        function ( xhr ) {
+
+          console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+        },
+
+
+        function ( error ) {
+
+          console.log( 'An error happened' );
+
+        });
+        
         // renderer
 
         renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -119,10 +155,12 @@
         window.addEventListener( 'resize', onWindowResize, false );
 
         createControls( perspectiveCamera );
-
-        render();
-
       }
+
+      
+
+
+
 
       function createControls( camera ) {
 
@@ -224,6 +262,31 @@
         
         render();
       }
+
+
+
+      // charmander.onmousedown = function(event) {
+
+      // let shiftX = event.clientX - charmander.position.x;
+      // let shiftY = event.clientY - charmander.position.y;
+
+
+      // moveAt(event.pageX, event.pageY);
+
+      // function moveAt(pageX, pageY) {
+      //   charmander.position.x = pageX - shiftX ;
+      //   charmander.position.y = pageY - shiftY;
+      // }
+      // function onMouseMove(event) {
+      //   moveAt(event.pageX, event.pageY);
+      // }
+
+      // document.addEventListener('mousemove', onMouseMove);
+
+      // charmander.onmouseup = function() {
+      //   document.removeEventListener('mousemove', onMouseMove);
+      //   charmander.onmouseup = null;
+      // };
  
   </script>
   <div style="text-align: center; border: 1px solid">
@@ -235,3 +298,64 @@
 
 </body>
 </html>
+
+
+
+<!-- 
+p1 = [
+0, 1, 2
+3, "na", 4
+5, 6, 7
+]
+
+
+p2 = [
+
+0, 1, 2
+
+]
+
+p3 = 
+
+[ 0, "na", "na"
+  1, "na", "na"
+  2, "na", "na"
+]
+
+p4 = 
+
+[ 0, 1, 2,]
+
+p5 = 
+
+[ 0, "na", "na"
+  1, "na", "na"
+  2, "na", "na"
+]
+
+
+
+p6= [
+
+0, 1, 2, 3
+]
+
+p7 = [
+
+0, 1, 2
+3, "na", 4
+5, 6, 7
+]
+
+
+
+
+p1 top -> p2
+
+p2 top -> p7 top
+p7 top -> p2 top
+
+p7 bottom -> p4
+
+p4 top -> p1 bottom
+ -->
