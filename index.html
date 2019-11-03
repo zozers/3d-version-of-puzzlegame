@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Thesis game 3d prototype</title>
+  <meta charset="utf-8">
+</head>
+<body style="margin: 0;">
+
+  <script src="js/three.js"></script>
+  <script src="js/TrackballControls.js"></script>
+  <script>
+
+
+      var colorArr = [0xf3ce30, 0x3aa3b1, 0xe5534f];
+
+      var colorObj = {
+        red: {"r": 0.8980392156862745, "g": 0.3254901960784314, "b": 0.30980392156862746},
+        blue: {"r": 0.22745098039215686, "g": 0.6392156862745098, "b": 0.6941176470588235},
+        yellow: {"r": 0.9529411764705882, "g": 0.807843137254902, "b": 0.18823529411764706}
+      }
+
+
+      function generate_random_cube_material(colorArr){
+
+        var cube_material = [];
+
+        for(var i=0; i < 6; i++){
+          cube_material.push(new THREE.MeshLambertMaterial({color : colorArr[Math.floor(Math.random()*colorArr.length)]}));
+        }
+
+        return cube_material;
+
+      }
+
+      var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
+
+      var params = {
+        orthographicCamera: false
+      };
+
+      var frustumSize = 400;
+
+      var material_matrices = []
+
+      init();
+      animate();
+
+      function init() {
+
+        var aspect = window.innerWidth / window.innerHeight;
+
+        var size = 75;
+
+        perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
+        perspectiveCamera.position.z = 300;
+        perspectiveCamera.position.x = 100;
+        perspectiveCamera.position.y = -100;
+
+
+
+        orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
+        orthographicCamera.position.z = 500;
+
+        // world
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0x6B7780 );
+        var geometry = new THREE.BoxBufferGeometry(size,size,size);
+        
+        for ( var i = 0; i < 9; i ++ ) {
+          var material = generate_random_cube_material(colorArr);
+          material_matrices.push(material)
+          var mesh = new THREE.Mesh( geometry, material );
+          if(i <= 2){
+            mesh.position.x = ((i*size) - (size/2));
+            mesh.position.y = (-1*(size/2));
+            mesh.position.z = (0);
+            var tempx = i
+          }
+          else if(i > 2 && i < 5){
+
+            mesh.position.x = ((tempx*size)-(size/2));
+            mesh.position.y = ((i-2) * size - (size/2));
+            console.log(i);
+            mesh.position.z = (0);
+            var tempy = i-2
+          }
+          
+          else if(i >=5 && i < 7){
+            mesh.position.x = ((i%2)*size-(size/2));
+            mesh.position.y = (tempy * size-(size/2));
+            mesh.position.z = (0);
+          }
+          else{
+            mesh.position.x = (-1*(size/2))
+            mesh.position.y = ((tempy-1) * size - (size/2));
+            mesh.position.z = (0);
+          }
+          mesh.updateMatrix();
+          mesh.matrixAutoUpdate = false;
+          scene.add( mesh );
+
+        }
+        // lights
+
+        var light = new THREE.AmbientLight( 0xFFFFFF );
+        scene.add( light );
+
+        // renderer
+
+        renderer = new THREE.WebGLRenderer( { antialias: true } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight * 0.9 );
+        document.body.appendChild( renderer.domElement );
+
+
+        //
+
+        window.addEventListener( 'resize', onWindowResize, false );
+
+        createControls( perspectiveCamera );
+
+        render();
+
+      }
+
+      function createControls( camera ) {
+
+        controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+        controls.rotateSpeed = 2.0;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 2.0;
+
+        controls.staticMoving = true;
+        controls.dynamicDampingFactor = 0.3;
+
+        controls.keys = [ 65, 83, 68 ];
+
+        controls.addEventListener( 'change', render );
+
+      }
+
+      function onWindowResize() {
+
+        var aspect = window.innerWidth / (window.innerHeight * 0.9);
+
+        perspectiveCamera.aspect = aspect;
+        perspectiveCamera.updateProjectionMatrix();
+
+        orthographicCamera.left = - frustumSize * aspect / 2;
+        orthographicCamera.right = frustumSize * aspect / 2;
+        orthographicCamera.top = frustumSize / 2;
+        orthographicCamera.bottom = - frustumSize / 2;
+        orthographicCamera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, (window.innerHeight*0.9) );
+
+        controls.handleResize();
+
+        render();
+
+      }
+
+      function animate() {
+
+        requestAnimationFrame( animate );
+
+        controls.update();
+
+      }
+
+      function render() {
+
+        var camera = perspectiveCamera;
+        renderer.render( scene, camera );
+
+      }
+
+      function swap(c1, c2){
+
+        if( c1 == "1" && c2 == "2"){
+          for(var i = 0; i < material_matrices.length; i++){
+            for(var j=0; j < material_matrices[0].length; j++){
+              if(material_matrices[i][j].color.r == colorObj.red.r){
+                material_matrices[i][j].color = colorObj.yellow;
+                console.log("ZOE IS AWESOME");
+              }
+              else if(material_matrices[i][j].color.r == colorObj.yellow.r){
+                material_matrices[i][j].color = colorObj.red;
+              }
+            }
+          }
+        }
+
+        else if(c1 == "1" && c2 == "3"){
+          for(var i = 0; i < material_matrices.length; i++){
+            for(var j=0; j < material_matrices[0].length; j++){
+              if(material_matrices[i][j].color.r == colorObj.red.r){
+                material_matrices[i][j].color = colorObj.blue;
+                console.log("ZOE IS AWESOME");
+              }
+              else if(material_matrices[i][j].color.r == colorObj.blue.r){
+                material_matrices[i][j].color = colorObj.red;
+              }
+            }
+          }
+        }
+
+        else{
+
+          for(var i = 0; i < material_matrices.length; i++){
+            for(var j=0; j < material_matrices[0].length; j++){
+              if(material_matrices[i][j].color.r == colorObj.yellow.r){
+                material_matrices[i][j].color = colorObj.blue;
+                console.log("ZOE IS AWESOME");
+              }
+              else if(material_matrices[i][j].color.r == colorObj.blue.r){
+                material_matrices[i][j].color = colorObj.yellow;
+              }
+            }
+          }
+        }
+        
+        render();
+      }
+ 
+  </script>
+  <div style="text-align: center; border: 1px solid">
+    <button type="button" onclick="swap(1, 2)">Swap Yellow and Red</button>
+
+    <button type="button" onclick="swap(1, 3)">Swap Red and Blue</button>
+    <button type="button" onclick="swap(2, 3)">Swap Yellow and Blue</button>
+  </div>
+
+</body>
+</html>
