@@ -12,7 +12,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	var _mouse = new THREE.Vector2();
 	var _offset = new THREE.Vector3();
 	var _intersection = new THREE.Vector3();
-	var _worldPosition = new THREE.Vector3();
+	var _worldPosition = new THREE.Vector3();	
 	var _inverseMatrix = new THREE.Matrix4();
 
 	var _selected = null, _hovered = null;
@@ -65,6 +65,9 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		if ( _selected && scope.enabled ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+
+				console.log(_selected.position);
+				console.log(_intersection.sub( _offset ).applyMatrix4( _inverseMatrix ));
 
 				_selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
 
