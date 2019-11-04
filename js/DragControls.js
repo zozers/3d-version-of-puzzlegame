@@ -207,7 +207,40 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
+				var magicPos = _intersection.sub( _offset ).applyMatrix4( _inverseMatrix );
+
+				if(_selected.position.x - magicPos.x < -0.5 && _selected.position.x < 16.5){
+					if(_selected.rotation.z != 1.6814089933346243){
+						_selected.rotation.z = 1.6814089933346243;
+					}
+					
+					console.log(_selected);
+					_selected.position.x += 1.5
+				}
+
+				else if(_selected.position.x - magicPos.x > 1.0 && _selected.position.x > -1.5){
+					if(_selected.rotation.z != -1.6814089933346243){
+						_selected.rotation.z = -1.6814089933346243;
+					}
+					_selected.position.x -= 1.5
+				}
+
+				if(_selected.position.y - magicPos.y < -0.5 && _selected.position.y < 16.5){
+					if(_selected.rotation.z != -3.0972149518191){
+						_selected.rotation.z = -3.0972149518191
+					}
+					
+					_selected.position.y += 1.5
+				}
+
+				else if(_selected.position.y - magicPos.y > 1.0 && _selected.position.y > -1.5){
+					if(_selected.rotation.z != 0){
+						_selected.rotation.z = 0;
+					}
+					_selected.position.y -= 1.5
+				}
+
+				// _selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
 
 			}
 
